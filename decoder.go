@@ -25,13 +25,13 @@ import (
 
 **/
 type Form struct {
-	dest        map[string]interface{}
-	raw         string
-	state       int
-	currentPath []string
-	current     string
+	dest              map[string]interface{}
+	raw               string
+	state             int
+	currentPath       []string
+	current           string
 	needQueryUnescape bool
-	pathCache map[string]int
+	pathCache         map[string]int
 }
 
 func NewForm(raw string) *Form {
@@ -42,7 +42,7 @@ func NewForm(raw string) *Form {
 	return form
 }
 
-func (form *Form)NeedQueryUnescape(need bool) {
+func (form *Form) NeedQueryUnescape(need bool) {
 	form.needQueryUnescape = need
 }
 
@@ -71,9 +71,9 @@ func (form *Form) Decode() (map[string]interface{}, error) {
 				key := pair[:index]
 				val := pair[index+1:]
 
-				insertValue(form,&vals, key, val,form.needQueryUnescape)
+				insertValue(form, &vals, key, val, form.needQueryUnescape)
 			} else {
-				insertValue(form,&vals, pair, "",form.needQueryUnescape)
+				insertValue(form, &vals, pair, "", form.needQueryUnescape)
 			}
 			current = ""
 			continue
@@ -89,17 +89,17 @@ func (form *Form) Decode() (map[string]interface{}, error) {
 		if index > 0 {
 			key := pair[:index]
 			val := pair[index+1:]
-			insertValue(form,&vals, key, val,form.needQueryUnescape)
+			insertValue(form, &vals, key, val, form.needQueryUnescape)
 		} else {
-			insertValue(form,&vals, pair, "",form.needQueryUnescape)
+			insertValue(form, &vals, pair, "", form.needQueryUnescape)
 		}
 		current = ""
 	}
 	return form.parseArray(vals), nil
 }
 
-func insertValue(form *Form,destP *map[string]interface{}, key string, val string,need bool) {
-	key,_ = url.PathUnescape(key)
+func insertValue(form *Form, destP *map[string]interface{}, key string, val string, need bool) {
+	key, _ = url.PathUnescape(key)
 
 	var path []string
 	var current string
@@ -128,9 +128,9 @@ func insertValue(form *Form,destP *map[string]interface{}, key string, val strin
 	for i := 0; i < len(path)-1; i++ {
 		p := path[i]
 		if p == "" {
-			c := strings.Join(path,",")
+			c := strings.Join(path, ",")
 			p = fmt.Sprint(form.pathCache[c])
-			form.pathCache[c] = form.pathCache[c]+1
+			form.pathCache[c] = form.pathCache[c] + 1
 		}
 		if _, ok := dest[p].(map[string]interface{}); !ok {
 			dest[p] = make(map[string]interface{})
@@ -141,7 +141,7 @@ func insertValue(form *Form,destP *map[string]interface{}, key string, val strin
 	if p == "" {
 		p = fmt.Sprint(len(dest))
 	}
-	val,_ = url.PathUnescape(val)
+	val, _ = url.QueryUnescape(val)
 	dest[p] = val
 }
 
